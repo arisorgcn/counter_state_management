@@ -20,22 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:counter_state_management/counter_event.dart';
-import 'package:counter_state_management/counter_state.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
 ///
 /// @author Aris Hu created at 2020-12-25
 ///
-class CounterBloc extends Bloc<CounterEvent, CounterState> {
-  CounterBloc({CounterState initialState}) : super(CounterState.init());
+class CounterState {
+  int counter;
 
-  @override
-  Stream<CounterState> mapEventToState(CounterEvent event) async* {
-    if (event is IncrementEvent) {
-      yield CounterState(counter: state.counter + 1);
-    } else if (event is DecrementEvent) {
-      yield CounterState(counter: state.counter - 1);
-    }
+  CounterState._();
+
+  CounterState({this.counter});
+
+  factory CounterState.init() {
+    return CounterState._()..counter = 0;
   }
 }

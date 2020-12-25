@@ -21,9 +21,10 @@
 // SOFTWARE.
 
 import 'package:counter_state_management/counter_bloc.dart';
+import 'package:counter_state_management/counter_event.dart';
+import 'package:counter_state_management/counter_state.dart';
 import 'package:flutter/material.dart';
-
-import 'counter_event.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -54,13 +55,27 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _counterBloc = CounterBloc();
-
   @override
   void dispose() {
-    _counterBloc.dispose();
     super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CounterBloc(),
+      child: CounterWidget(widget: widget),
+    );
+  }
+}
+
+class CounterWidget extends StatelessWidget {
+  const CounterWidget({
+    Key key,
+    @required this.widget,
+  }) : super(key: key);
+
+  final MyHomePage widget;
 
   @override
   Widget build(BuildContext context) {
@@ -75,16 +90,13 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:',
             ),
-            StreamBuilder(
-              initialData: 0,
-              stream: _counterBloc.counter,
-              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                return snapshot.hasData
-                    ? Text(
-                        '${snapshot.data}',
-                        style: Theme.of(context).textTheme.headline4,
-                      )
-                    : SizedBox.shrink();
+            BlocBuilder<CounterBloc, CounterState>(
+              buildWhen: (oldState, state) => state.counter != oldState.counter,
+              builder: (_, state) {
+                return Text(
+                  '${state.counter}',
+                  style: Theme.of(context).textTheme.headline4,
+                );
               },
             ),
           ],
@@ -94,13 +106,13 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () => _counterBloc.counterEventSink.add(IncrementEvent()),
+            onPressed: () => context.read<CounterBloc>().add(IncrementEvent()),
             tooltip: 'Increment',
             child: Icon(Icons.add),
           ),
           SizedBox(width: 0.6, height: 8, child: VerticalDivider()),
           FloatingActionButton(
-            onPressed: () => _counterBloc.counterEventSink.add(DecrementEvent()),
+            onPressed: () => context.read<CounterBloc>().add(DecrementEvent()),
             tooltip: 'Decrement',
             child: Icon(Icons.remove),
           ),
