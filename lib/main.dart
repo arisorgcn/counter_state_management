@@ -20,9 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import 'package:counter_state_management/counter_bloc.dart';
-import 'package:counter_state_management/counter_event.dart';
-import 'package:counter_state_management/counter_state.dart';
+import 'package:counter_state_management/counter_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,16 +29,17 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final String title = 'Flutter Bloc With Cubit';
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: title),
     );
   }
 }
@@ -57,13 +56,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
+    BlocProvider.of<CounterCubit>(context).close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CounterBloc(),
+      create: (_) => CounterCubit(),
       child: CounterWidget(widget: widget),
     );
   }
@@ -90,11 +90,10 @@ class CounterWidget extends StatelessWidget {
             Text(
               'You have pushed the button this many times:',
             ),
-            BlocBuilder<CounterBloc, CounterState>(
-              buildWhen: (oldState, state) => state.counter != oldState.counter,
-              builder: (_, state) {
+            BlocBuilder<CounterCubit, int>(
+              builder: (_, count) {
                 return Text(
-                  '${state.counter}',
+                  '$count',
                   style: Theme.of(context).textTheme.headline4,
                 );
               },
@@ -106,13 +105,13 @@ class CounterWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () => context.read<CounterBloc>().add(IncrementEvent()),
+            onPressed: () => context.read<CounterCubit>().increment(),
             tooltip: 'Increment',
             child: Icon(Icons.add),
           ),
           SizedBox(width: 0.6, height: 8, child: VerticalDivider()),
           FloatingActionButton(
-            onPressed: () => context.read<CounterBloc>().add(DecrementEvent()),
+            onPressed: () => context.read<CounterCubit>().decrement(),
             tooltip: 'Decrement',
             child: Icon(Icons.remove),
           ),

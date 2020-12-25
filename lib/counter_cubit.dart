@@ -20,17 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 ///
 /// @author Aris Hu created at 2020-12-25
 ///
-class CounterState {
-  int counter;
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0);
 
-  CounterState._();
+  void increment() => emit(state + 1);
 
-  CounterState({this.counter});
-
-  factory CounterState.init() {
-    return CounterState._()..counter = 0;
-  }
+  void decrement() => emit(state - 1);
 }
