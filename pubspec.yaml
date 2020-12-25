@@ -29,6 +29,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
+  # RxDart adds additional capabilities to Dart Streams and StreamControllers.
+  # https://github.com/ReactiveX/rxdart
+  rxdart: ^0.25.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

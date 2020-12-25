@@ -23,6 +23,7 @@
 import 'dart:async';
 
 import 'package:counter_state_management/counter_event.dart';
+import 'package:rxdart/rxdart.dart';
 
 ///
 /// @author Aris Hu created at 2020-12-25
@@ -30,12 +31,12 @@ import 'package:counter_state_management/counter_event.dart';
 class CounterBloc {
   int _counter = 0;
 
-  final _counterStateController = StreamController<int>();
+  /// provider a subject
+  final _counterSubject = BehaviorSubject<int>();
 
-  StreamSink<int> get _inCounter => _counterStateController.sink;
+  Stream<int> get counter => _counterSubject.stream;
 
-  Stream<int> get counter => _counterStateController.stream;
-
+  /// event sink for handling events
   final _counterEventController = StreamController<CounterEvent>();
 
   Sink<CounterEvent> get counterEventSink => _counterEventController.sink;
@@ -50,11 +51,11 @@ class CounterBloc {
     } else if (event is DecrementEvent) {
       _counter--;
     }
-    _inCounter.add(_counter);
+    _counterSubject.add(_counter);
   }
 
   void dispose() {
-    _counterStateController.close();
+    _counterSubject.close();
     _counterEventController.close();
   }
 }
