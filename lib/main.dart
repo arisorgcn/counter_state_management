@@ -20,7 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import 'package:counter_state_management/counter_bloc.dart';
 import 'package:flutter/material.dart';
+
+import 'counter_event.dart';
 
 void main() {
   runApp(MyApp());
@@ -51,12 +54,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final _counterBloc = CounterBloc();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void dispose() {
+    _counterBloc.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,17 +75,36 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            StreamBuilder(
+              initialData: 0,
+              stream: _counterBloc.counter,
+              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                return snapshot.hasData
+                    ? Text(
+                        '${snapshot.data}',
+                        style: Theme.of(context).textTheme.headline4,
+                      )
+                    : SizedBox.shrink();
+              },
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () => _counterBloc.counterEventSink.add(IncrementEvent()),
+            tooltip: 'Increment',
+            child: Icon(Icons.add),
+          ),
+          SizedBox(width: 0.6, height: 8, child: VerticalDivider()),
+          FloatingActionButton(
+            onPressed: () => _counterBloc.counterEventSink.add(DecrementEvent()),
+            tooltip: 'Decrement',
+            child: Icon(Icons.remove),
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
