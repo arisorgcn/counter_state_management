@@ -21,22 +21,33 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import 'counter_model.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MyApp(
+    model: CounterModel(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final CounterModel model;
+
+  MyApp({Key key, @required this.model}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return ScopedModel(
+      model: model,
+      child: MaterialApp(
+        title: 'Scoped Model Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: MyHomePage(title: 'Scoped Model Demo'),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -51,14 +62,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,17 +75,37 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            ScopedModelDescendant<CounterModel>(
+              builder: (context, child, model) {
+                return Text(
+                  '${model.counter.toString()}',
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              },
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+      floatingActionButton: ScopedModelDescendant<CounterModel>(
+        rebuildOnChange: false,
+        builder: (context, child, model) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: model.increment,
+                tooltip: 'Increment',
+                child: Icon(Icons.add),
+              ),
+              SizedBox(width: 0.6, height: 8, child: VerticalDivider()),
+              FloatingActionButton(
+                onPressed: model.decrement,
+                tooltip: 'Decrement',
+                child: Icon(Icons.remove),
+              )
+            ],
+          );
+        },
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
