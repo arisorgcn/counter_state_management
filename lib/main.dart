@@ -24,6 +24,7 @@ import 'package:counter_state_management/counter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'counter_event.dart';
+import 'counter_provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,13 +34,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return CounterProvider(
+      bloc: CounterBloc(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -54,16 +58,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _counterBloc = CounterBloc();
-
   @override
-  void dispose() {
-    _counterBloc.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    final _counterBloc = CounterProvider.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -81,9 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
               builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
                 return snapshot.hasData
                     ? Text(
-                        '${snapshot.data}',
-                        style: Theme.of(context).textTheme.headline4,
-                      )
+                  '${snapshot.data}',
+                  style: Theme.of(context).textTheme.headline4,
+                )
                     : SizedBox.shrink();
               },
             ),
